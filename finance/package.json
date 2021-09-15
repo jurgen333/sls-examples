@@ -1,0 +1,21 @@
+{
+  "name": "finance",
+  "version": "1.0.0",
+  "description": "Responsible for handeling finacial information",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jurgen Xhaja",
+  "license": "ISC",
+  "dependencies": {
+    "serverless-dotenv-plugin": "^3.9.0",
+    "serverless-offline": "^8.2.0",
+    "serverless-plugin-ifelse": "^1.0.7",
+    "serverless-prune-plugin": "^1.5.1",
+    "aws-sdk": "^2.530.0",
+    "moment": "^2.29.1",
+    "pdfmake": "^0.1.70",
+    "uuid": "^8.3.2"
+  }
+}

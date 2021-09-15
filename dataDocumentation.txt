@@ -1,0 +1,32 @@
+Invoices
+{
+    invoiceId,
+    orderId,
+    date,
+    userId,
+    pdfLink,
+    status
+}
+
+Order
+{
+    orderId,
+    date,
+    userId,
+    products: [
+        {
+            productId,
+            price,
+            productName,
+            quantity,
+        }
+    ],
+}
+
+User
+{
+    userId,
+    firstName,
+    lastName,
+    address,
+}

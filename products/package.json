@@ -1,0 +1,17 @@
+{
+  "name": "products",
+  "version": "1.0.0",
+  "description": "Handles the products information",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "serverless-dotenv-plugin": "^3.9.0",
+    "serverless-offline": "^8.2.0",
+    "serverless-plugin-ifelse": "^1.0.7",
+    "serverless-prune-plugin": "^1.5.1"
+  },
+  "author": "Jurgen Xhaja",
+  "license": "ISC"
+}

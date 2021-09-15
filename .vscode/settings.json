@@ -1,0 +1,35 @@
+{
+    "eslint.enable": true,
+    "editor.formatOnSave": true,
+    "autoimport.semicolon": true,
+    "prettier.semi": true,
+    "workbench.statusBar.visible": true,
+    "editor.minimap.enabled": false,
+    "editor.renderWhitespace": "all",
+    "editor.renderControlCharacters": false,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": true,
+    "editor.wordWrap": "on",
+    "terminal.integrated.rendererType": "dom",
+    "python.pythonPath": "/Users/alfredobelfiori/miniconda3/python.app",
+    "python.linting.pylintEnabled": true,
+    "workbench.colorTheme": "codeSTACKr Theme",
+    "window.zoomLevel": 0,
+    "code-runner.executorMap": {
+        "python": "$pythonPath -u $fullFileName"
+    },
+    "code-runner.showExecutionMessage": false,
+    "code-runner.clearPreviousOutput": true,
+    "prettier.trailingComma": "all",
+    "editor.tabSize": 4,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    "eslint.alwaysShowStatus": true,
+    "eslint.format.enable": true,
+    "eslint.lintTask.enable": true,
+    "cSpell.words": [
+        "Jurgen",
+        "downloadi"
+    ]
+}
