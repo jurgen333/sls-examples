@@ -6,12 +6,22 @@ Invoices
     userId,
     pdfLink,
     status
+    totalAmount
+}
+
+Products 
+{
+    productId,
+    productName,
+    productDescription,
+    price,
 }
 
 Order
 {
     orderId,
     date,
+    address,
     userId,
     products: [
         {
@@ -28,5 +38,7 @@ User
     userId,
     firstName,
     lastName,
+    budget,
+    email,
     address,
 }

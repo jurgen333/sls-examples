@@ -37,19 +37,7 @@ provider:
         - "dynamodb:BatchWriteItem"
         - "dynamodb:DeleteItem"
       Resource:
-        - arn:aws:dynamodb:${env:REGION,'eu-west-2'}:${env:ACCOUNT_ID}:table/usersProfiles
         - arn:aws:dynamodb:${env:REGION,'eu-west-2'}:${env:ACCOUNT_ID}:table/invoices
-    - Effect: "Allow"
-      Action:
-        - "sns:*"
-      Resource:
-        - "*"
-    - Effect: "Allow"
-      Action:
-        - "ses:*"
-      Resource:
-        - "*"
-
     - Effect: "Allow"
       Action:
         - "sqs:*"
@@ -75,8 +63,6 @@ package:
   exclude:
 
 functions:
-  hello:
-    handler: handler.hello
   generatePdfInvoice:
     handler: src/invoicePdfGeneration.handler
     name: invoice-pdf-generation
@@ -86,7 +72,7 @@ functions:
     environment:
       invoicesTableName: invoices
       invoiceBucketName: jxh-invoices-pdf-bucket
-      invoiceQueue: https://sqs.${env:REGION,'eu-west-2'}.amazonaws.com/${env:ACCOUNT_ID}/invoice-pdf-generation
+      invoiceQueue: https://sqs.${env:REGION,'eu-west-1'}.amazonaws.com/${env:ACCOUNT_ID}/invoice-pdf-generation
     events: 
       - sqs:
           arn:
