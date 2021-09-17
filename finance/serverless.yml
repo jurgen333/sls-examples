@@ -1,4 +1,4 @@
-service: finance
+service: financeMicro
 
 plugins:
   localPath: "../node-modules"
@@ -37,7 +37,8 @@ provider:
         - "dynamodb:BatchWriteItem"
         - "dynamodb:DeleteItem"
       Resource:
-        - arn:aws:dynamodb:${env:REGION,'eu-west-2'}:${env:ACCOUNT_ID}:table/invoices
+        - arn:aws:dynamodb:${env:REGION,'eu-central-1'}:${env:ACCOUNT_ID}:table/invoices
+        - arn:aws:dynamodb:${env:REGION,'eu-central-1'}:${env:ACCOUNT_ID}:table/orders
     - Effect: "Allow"
       Action:
         - "sqs:*"
@@ -48,12 +49,13 @@ provider:
         - "s3:*"
       Resource:
         - "*" # 
-    
     - Effect: "Allow"
       Action:
         - "lambda:InvokeFunction"
       Resource:
-        - arn:aws:lambda:${env:REGION,'eu-west-2'}:${env:ACCOUNT_ID}:function:usersProfiles-ResponseManager-${self:provider.stage}
+        - arn:aws:lambda:${env:REGION,'eu-central-1'}:${env:ACCOUNT_ID}:function:productResponseManager
+        - arn:aws:lambda:${env:REGION,'eu-central-1'}:${env:ACCOUNT_ID}:function:userProfileResponseManager
+        - arn:aws:lambda:${env:REGION,'eu-central-1'}:${env:ACCOUNT_ID}:function:userProfileRemoveBudget
 
 # you can add packaging information here
 package:
@@ -84,6 +86,21 @@ functions:
                 - Ref: AWS::Region
                 - Ref: AWS::AccountId
                 - invoice-pdf-generation
+  createOrder:
+    handler: src/createOrder.handler
+    name: createOrder
+    timeout: 10
+    memorySize: 128
+    environment:
+      ordersTableName: orders
+      productsTableName: products
+      usersTableName: users
+    events:
+      - http:
+          path: v1/${self:service.name}
+          integration: lambda
+          method: get
+          cors: true
 
 # you can add CloudFormation resource templates here
 resources:

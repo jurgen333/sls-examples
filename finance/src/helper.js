@@ -3,10 +3,42 @@ const AWS = require('aws-sdk')
 const { v1: uuidv1 } = require('uuid')
 const PdfPrinter = require('pdfmake')
 const path = require('path')
+const moment = require('moment')
 
 const {
     userInvoiceTemplate,
 } = require('./pdfTemplate')
+
+const {
+    SYNC_LAMBDA_INVOKE_TYPE,
+    FUNCTION_NAMES,
+} = require('./constants')
+
+const invokeLambda = async (functionName, payload) => {
+    const lambda = new AWS.Lambda({ region: 'eu-central-1' })
+
+    const params = {
+        FunctionName: functionName,
+        InvocationType: SYNC_LAMBDA_INVOKE_TYPE,
+        Payload: JSON.stringify(payload),
+    }
+
+    return lambda.invoke(params)
+        .promise()
+        .then((data) => {
+            if (data.StatusCode >= 400) {
+                throw new Error(`Error received while invoking lambda with status code ${data.StatusCode}`)
+            }
+
+            const receivedPayload = JSON.parse(data.Payload)
+
+            if (receivedPayload !== null && receivedPayload.errorType === 'Error') {
+                throw new Error(receivedPayload.errorMessage)
+            }
+
+            return receivedPayload
+        })
+}
 
 const getPDFBuffer = (doc) => new Promise((resolve) => {
     const chunks = []
@@ -95,8 +127,99 @@ const createInvoice = async (
         })
 }
 
+const createOrder = async (userProfile, products) => {
+    const order = {
+        orderId: `order_${uuidv1()}`,
+        date: moment().format(),
+        userId: userProfile.userId,
+        contactEmail: userProfile.email,
+        address: userProfile.address,
+        products: products.map((product) => ({
+            productId: product.productId,
+            price: product.price,
+            productTitle: product.productTitle,
+            quantity: product.quantity,
+        })),
+
+    }
+
+    const params = {
+        TableName: process.env.ordersTableName,
+        Item: order,
+    }
+
+    const docClient = new AWS.DynamoDB.DocumentClient()
+
+    return docClient.put(params)
+        .promise()
+        .then((data) => data)
+        .catch((err) => {
+            console.log('Error creating order', err)
+            throw Error(`Order not created for user ${userProfile.userId}`)
+        })
+}
+
+const getUserProfile = async (req) => {
+    const payload = {
+        query: {
+            userId: req.userId,
+        },
+    }
+
+    return invokeLambda(FUNCTION_NAMES.GET_USER_PROFILE, payload)
+        .then((data) => data)
+        .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.log('Error when invoking get user profile from finance', error)
+            console.log('Payload ', payload)
+
+            throw new Error('Error when invoking get user profile from finance')
+        })
+}
+
+const updateUserBudget = async (userId, orderAmount) => {
+    const payload = {
+        body: {
+            userId,
+            amountToBeRemoved: orderAmount,
+        },
+    }
+
+    return invokeLambda(FUNCTION_NAMES.REMOVE_BUDGET_FROM_USER, payload)
+        .then((data) => data)
+        .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.log('Error when invoking remove budget from finance', error)
+            console.log('Payload ', payload)
+
+            throw new Error('Error when invoking remove budget from finance')
+        })
+}
+
+const getProducts = async (req) => {
+    const payload = {
+        query: {
+            productId: req.products.map((product) => product.productId),
+        },
+    }
+
+    return invokeLambda(FUNCTION_NAMES.GET_PRODUCTS, payload)
+        .then((data) => data)
+        .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.log('Error when invoking get products from finance', error)
+            console.log('Payload ', payload)
+
+            throw new Error('Error when invoking get products from finance')
+        })
+}
+
 module.exports = {
     generatePdf,
     createInvoice,
     uploadInvoiceToS3,
+    createOrder,
+    getUserProfile,
+    getProducts,
+    updateUserBudget,
 }
