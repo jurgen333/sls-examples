@@ -10,7 +10,7 @@ exports.handler = async (event, context) => {
     if (eventName === 'INSERT') {
         const { NewImage } = event.Records[0].dynamodb
         const userId = NewImage.userId.S
-        const totalAmount = NewImage.totalAmount.N
+        const totalAmount = parseFloat(NewImage.totalAmount.N)
         const date = NewImage.date.S
         const contactEmail = NewImage.contactEmail.S
         const address = NewImage.address.S

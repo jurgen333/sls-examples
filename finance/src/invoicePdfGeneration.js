@@ -14,8 +14,8 @@ module.exports.handler = async (event, context, callback) => {
         const totalAmount = parseFloat(data.messageAttributes.totalAmount.stringValue)
 
         console.log('order', orderData)
-        console.log(user)
-        console.log(totalAmount)
+        console.log('User', user)
+        console.log('totalAmount', totalAmount)
         // eslint-disable-next-line no-await-in-loop
         const userPdfInvoice = await generatePdf({
             user,

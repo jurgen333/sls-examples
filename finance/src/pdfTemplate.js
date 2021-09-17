@@ -252,7 +252,7 @@ const userInvoice = ({
             },
             table: {
                 headerRows: 1,
-                widths: ['*', 40, 40, 40, 50, 40],
+                widths: ['*', 40, 40, 50],
                 body: [
                     [
                         {
@@ -286,7 +286,7 @@ const userInvoice = ({
                         },
                     ],
 
-                    orderData.products.map((product) => [
+                    ...orderData.products.map((product) => [
                         {
                             text: product.productTitle,
                             border: [false, false, false, true],
