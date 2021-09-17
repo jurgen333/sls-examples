@@ -56,6 +56,13 @@ functions:
           integration: lambda
           method: get
           cors: true
+  userProfileUpdateBudget:
+    handler: src/userProfileUpdateBudget.handler
+    name: userProfileUpdateBudget
+    timeout: 2
+    memorySize: 128
+    environment:
+      usersTableName: users
 
 # you can add CloudFormation resource templates here
 resources:

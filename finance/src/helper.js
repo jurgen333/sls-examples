@@ -5,9 +5,7 @@ const PdfPrinter = require('pdfmake')
 const path = require('path')
 const moment = require('moment')
 
-const {
-    userInvoiceTemplate,
-} = require('./pdfTemplate')
+const userInvoiceTemplate = require('./pdfTemplate')
 
 const {
     SYNC_LAMBDA_INVOKE_TYPE,
@@ -101,6 +99,7 @@ const createInvoice = async (
     user,
     ordersData,
     pdfLink,
+    orderAmount,
 ) => {
     const invoiceId = `inv_${uuidv1()}`
 
@@ -110,6 +109,7 @@ const createInvoice = async (
             invoiceId,
             userId: user.userId,
             pdfLink,
+            totalAmount: orderAmount,
             orderId: ordersData.orderId,
             date: ordersData.date,
             status: 'NOT PAID',
@@ -127,7 +127,7 @@ const createInvoice = async (
         })
 }
 
-const createOrder = async (userProfile, products) => {
+const createOrder = async (userProfile, products, totalAmount) => {
     const order = {
         orderId: `order_${uuidv1()}`,
         date: moment().format(),
@@ -140,7 +140,7 @@ const createOrder = async (userProfile, products) => {
             productTitle: product.productTitle,
             quantity: product.quantity,
         })),
-
+        totalAmount,
     }
 
     const params = {
@@ -152,17 +152,17 @@ const createOrder = async (userProfile, products) => {
 
     return docClient.put(params)
         .promise()
-        .then((data) => data)
+        .then((data) => params.Item)
         .catch((err) => {
             console.log('Error creating order', err)
             throw Error(`Order not created for user ${userProfile.userId}`)
         })
 }
 
-const getUserProfile = async (req) => {
+const getUserProfile = async (userId) => {
     const payload = {
         query: {
-            userId: req.userId,
+            userId,
         },
     }
 
@@ -177,15 +177,15 @@ const getUserProfile = async (req) => {
         })
 }
 
-const updateUserBudget = async (userId, orderAmount) => {
+const updateUserBudget = async (userId, newBudget) => {
     const payload = {
         body: {
             userId,
-            amountToBeRemoved: orderAmount,
+            newBudget,
         },
     }
 
-    return invokeLambda(FUNCTION_NAMES.REMOVE_BUDGET_FROM_USER, payload)
+    return invokeLambda(FUNCTION_NAMES.UPDATE_USER_BUDGET, payload)
         .then((data) => data)
         .catch((error) => {
             // eslint-disable-next-line no-console
@@ -199,7 +199,7 @@ const updateUserBudget = async (userId, orderAmount) => {
 const getProducts = async (req) => {
     const payload = {
         query: {
-            productId: req.products.map((product) => product.productId),
+            productIds: req.products.map((product) => product.productId),
         },
     }
 
@@ -214,6 +214,43 @@ const getProducts = async (req) => {
         })
 }
 
+const sendMessage = async (order, user, totalAmount) => {
+    const sqs = new AWS.SQS({
+        region: 'eu-central-1',
+    })
+
+    const params = {
+        MessageBody: 'Create invoice',
+        MessageAttributes: {
+            orderData: {
+                DataType: 'String',
+                StringValue: JSON.stringify(order),
+            },
+            user: {
+                DataType: 'String',
+                StringValue: JSON.stringify(user),
+            },
+            totalAmount: {
+                DataType: 'String',
+                StringValue: JSON.stringify(totalAmount),
+            },
+        },
+        QueueUrl: process.env.invoiceQueue,
+    }
+    console.log(params)
+    console.log('sending message')
+
+    // eslint-disable-next-line no-await-in-loop
+    await sqs.sendMessage(params)
+        .promise()
+        .then()
+        .catch((err) => {
+            console.log('params', params)
+            console.log('Error sending message to queue', err)
+            throw Error('Error sending message to queue')
+        })
+}
+
 module.exports = {
     generatePdf,
     createInvoice,
@@ -222,4 +259,5 @@ module.exports = {
     getUserProfile,
     getProducts,
     updateUserBudget,
+    sendMessage,
 }

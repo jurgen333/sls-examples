@@ -3,6 +3,7 @@ const {
     getUserProfile,
     getProducts,
     updateUserBudget,
+    sendMessage,
 } = require('./helper')
 
 const {
@@ -11,7 +12,7 @@ const {
 
 module.exports.handler = async (event) => {
     // await seedUserProfiles()
-    const userProfile = await getUserProfile(event.body)
+    const userProfile = await getUserProfile(event.body.userId)
     const products = await getProducts(event.body)
 
     const productsWithQuantityAdded = products.map((product) => ({
@@ -22,15 +23,19 @@ module.exports.handler = async (event) => {
     const orderTotal = productsWithQuantityAdded.reduce(
         (acc, curr) => acc + (curr.quantity * curr.price), 0,
     )
-
-    const enoughBudget = userHasEnoughBudget(userProfile, orderTotal)
+    const enoughBudget = userHasEnoughBudget(userProfile.budget, orderTotal)
 
     if (!enoughBudget) {
         throw Error('Not enough budget')
     }
 
-    const order = await createOrder(userProfile, productsWithQuantityAdded)
+    await updateUserBudget(userProfile.userId, userProfile.budget - orderTotal)
 
-    await updateUserBudget(userProfile.userId, orderTotal)
+    const order = await createOrder(userProfile, productsWithQuantityAdded, orderTotal)
+
+    if (!order) {
+        await updateUserBudget(userProfile.userId, userProfile.budget)
+    }
+
     return order
 }

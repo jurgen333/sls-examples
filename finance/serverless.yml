@@ -41,6 +41,14 @@ provider:
         - arn:aws:dynamodb:${env:REGION,'eu-central-1'}:${env:ACCOUNT_ID}:table/orders
     - Effect: "Allow"
       Action:
+        - "dynamodb:GetRecords"
+        - "dynamodb:GetShardIterator"
+        - "dynamodb:DescribeStream"
+        - "dynamodb:ListStream"
+      Resource:
+        - "*"
+    - Effect: "Allow"
+      Action:
         - "sqs:*"
       Resource:
         - "*"
@@ -55,7 +63,7 @@ provider:
       Resource:
         - arn:aws:lambda:${env:REGION,'eu-central-1'}:${env:ACCOUNT_ID}:function:productResponseManager
         - arn:aws:lambda:${env:REGION,'eu-central-1'}:${env:ACCOUNT_ID}:function:userProfileResponseManager
-        - arn:aws:lambda:${env:REGION,'eu-central-1'}:${env:ACCOUNT_ID}:function:userProfileRemoveBudget
+        - arn:aws:lambda:${env:REGION,'eu-central-1'}:${env:ACCOUNT_ID}:function:userProfileUpdateBudget
 
 # you can add packaging information here
 package:
@@ -69,12 +77,11 @@ functions:
     handler: src/invoicePdfGeneration.handler
     name: invoice-pdf-generation
     timeout: 10
-    versionFunctions: true 
     memorySize: 128
     environment:
       invoicesTableName: invoices
       invoiceBucketName: jxh-invoices-pdf-bucket
-      invoiceQueue: https://sqs.${env:REGION,'eu-west-1'}.amazonaws.com/${env:ACCOUNT_ID}/invoice-pdf-generation
+      invoiceQueue: https://sqs.${env:REGION,'eu-central-1'}.amazonaws.com/${env:ACCOUNT_ID}/invoice-pdf-generation
     events: 
       - sqs:
           arn:
@@ -95,12 +102,20 @@ functions:
       ordersTableName: orders
       productsTableName: products
       usersTableName: users
+      invoiceQueue: https://sqs.${env:REGION,'eu-central-1'}.amazonaws.com/${env:ACCOUNT_ID}/invoice-pdf-generation
     events:
       - http:
           path: v1/${self:service.name}
           integration: lambda
           method: get
           cors: true
+  OrdersOperationsManager:
+    handler: src/ordersOperationsManager.handler
+    name: OrdersOperationsManager
+    timeout: 10
+    memorySize: 128
+    environment:
+      invoiceQueue: https://sqs.${env:REGION,'eu-central-1'}.amazonaws.com/${env:ACCOUNT_ID}/invoice-pdf-generation
 
 # you can add CloudFormation resource templates here
 resources:
@@ -165,4 +180,25 @@ resources:
               KeyType: RANGE
           Projection:
             ProjectionType: "ALL"
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+  EventInvokeConfigTransactionOperationManager:
+      Type: AWS::Lambda::EventSourceMapping
+      DependsOn:
+        - "OrdersOperationsManagerLambdaFunction"
+      Properties:
+        BatchSize: 1
+        BisectBatchOnFunctionError: true
+        Enabled: true
+        EventSourceArn:
+          Fn::GetAtt: [OrdersTable, StreamArn]
+        FunctionName:
+          Fn::GetAtt:
+            - "OrdersOperationsManagerLambdaFunction"
+            - "Arn"
+        MaximumBatchingWindowInSeconds: 10
+        MaximumRecordAgeInSeconds: 60
+        MaximumRetryAttempts: 1
+        ParallelizationFactor: 1
+        StartingPosition: LATEST
 

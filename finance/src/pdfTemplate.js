@@ -1,8 +1,9 @@
 const moment = require('moment')
 // Supplier invoice to be shown to supplier
 const userInvoice = ({
-    order,
     user,
+    orderData,
+    totalAmount,
 }) => ({
     content: [
         {
@@ -50,7 +51,7 @@ const userInvoice = ({
                                         alignment: 'right',
                                     },
                                     {
-                                        text: moment(date).format('YYYY-MM-DD'),
+                                        text: moment().format('YYYY-MM-DD'),
                                         bold: true,
                                         color: '#333333',
                                         fontSize: 12,
@@ -134,7 +135,7 @@ const userInvoice = ({
                 },
                 {
                     alignment: 'right',
-                    text: user.userName,
+                    text: user.firstName,
                     bold: true,
                     color: '#333333',
                 },
@@ -276,22 +277,7 @@ const userInvoice = ({
                             textTransform: 'uppercase',
                         },
                         {
-                            text: 'VAT',
-                            fillColor: '#eaf2f5',
-                            border: [false, true, false, true],
-                            margin: [0, 5, 0, 5],
-                            textTransform: 'uppercase',
-                        },
-                        {
-                            text: 'AMOUNT GBP',
-                            border: [false, true, false, true],
-                            alignment: 'right',
-                            fillColor: '#eaf2f5',
-                            margin: [0, 5, 0, 5],
-                            textTransform: 'uppercase',
-                        },
-                        {
-                            text: '1.5 % Licence Fee',
+                            text: 'AMOUNT',
                             border: [false, true, false, true],
                             alignment: 'right',
                             fillColor: '#eaf2f5',
@@ -300,82 +286,32 @@ const userInvoice = ({
                         },
                     ],
 
-                    [
+                    orderData.products.map((product) => [
                         {
-                            text: 'Gravity Blanket',
+                            text: product.productTitle,
                             border: [false, false, false, true],
                             margin: [0, 5, 0, 5],
                             alignment: 'left',
                         },
                         {
-                            text: '10.00',
+                            text: product.quantity,
                             border: [false, false, false, true],
                             margin: [0, 5, 0, 5],
                             alignment: 'left',
                         },
                         {
-                            text: '30.00',
-                            border: [false, false, false, true],
-                            margin: [0, 5, 0, 5],
-                            alignment: 'left',
-                        },
-                        {
-                            text: '20%',
+                            text: (product.price / 100).toFixed(2),
                             border: [false, false, false, true],
                             margin: [0, 5, 0, 5],
                             alignment: 'left',
                         },
                         {
                             border: [false, false, false, true],
-                            text: '360.00',
+                            text: (product.price * product.quantity / 100).toFixed(2),
                             alignment: 'right',
                             margin: [0, 5, 0, 5],
                         },
-                        {
-                            border: [false, false, false, true],
-                            text: '5.40',
-                            alignment: 'right',
-                            margin: [0, 5, 0, 5],
-                        },
-                    ],
-                    [
-                        {
-                            text: 'Books',
-                            border: [false, false, false, true],
-                            margin: [0, 5, 0, 5],
-                            alignment: 'left',
-                        },
-                        {
-                            text: '52.00',
-                            border: [false, false, false, true],
-                            margin: [0, 5, 0, 5],
-                            alignment: 'left',
-                        },
-                        {
-                            text: '25.00',
-                            border: [false, false, false, true],
-                            margin: [0, 5, 0, 5],
-                            alignment: 'left',
-                        },
-                        {
-                            text: '20%',
-                            border: [false, false, false, true],
-                            margin: [0, 5, 0, 5],
-                            alignment: 'left',
-                        },
-                        {
-                            border: [false, false, false, true],
-                            text: '1560.00',
-                            alignment: 'right',
-                            margin: [0, 5, 0, 5],
-                        },
-                        {
-                            border: [false, false, false, true],
-                            text: '23.40',
-                            alignment: 'right',
-                            margin: [0, 5, 0, 5],
-                        },
-                    ],
+                    ]),
                 ],
             },
         },
@@ -431,7 +367,7 @@ const userInvoice = ({
                         },
                         {
                             border: [false, true, false, true],
-                            text: '28.80',
+                            text: (totalAmount / 100).toFixed(2),
                             alignment: 'right',
                             fillColor: '#f5f5f5',
                             margin: [0, 5, 0, 5],

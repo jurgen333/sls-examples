@@ -1,0 +1,79 @@
+{
+    "Records": [
+        {
+            "eventID": "946933711c279634a3cd095f061de20f",
+            "eventName": "INSERT",
+            "eventVersion": "1.1",
+            "eventSource": "aws:dynamodb",
+            "awsRegion": "eu-central-1",
+            "dynamodb": {
+                "ApproximateCreationDateTime": 1631897159,
+                "Keys": {
+                    "orderId": {
+                        "S": "order_bc264e70-17d6-11ec-a9c6-ed01f9dbb002"
+                    }
+                },
+                "NewImage": {
+                    "date": {
+                        "S": "2021-09-17T18:45:58+02:00"
+                    },
+                    "totalAmount": {
+                        "N": "3920"
+                    },
+                    "address": {
+                        "S": ""
+                    },
+                    "contactEmail": {
+                        "S": "jurgenxhaja33@gmail.com"
+                    },
+                    "orderId": {
+                        "S": "order_bc264e70-17d6-11ec-a9c6-ed01f9dbb002"
+                    },
+                    "userId": {
+                        "S": "1"
+                    },
+                    "products": {
+                        "L": [
+                            {
+                                "M": {
+                                    "productTitle": {
+                                        "S": "Emotional Inteligence"
+                                    },
+                                    "quantity": {
+                                        "N": "1"
+                                    },
+                                    "productId": {
+                                        "S": "2"
+                                    },
+                                    "price": {
+                                        "N": "1220"
+                                    }
+                                }
+                            },
+                            {
+                                "M": {
+                                    "productTitle": {
+                                        "S": "Atomic Habits"
+                                    },
+                                    "quantity": {
+                                        "N": "2"
+                                    },
+                                    "productId": {
+                                        "S": "1"
+                                    },
+                                    "price": {
+                                        "N": "1350"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "SequenceNumber": "255600000000016842972170",
+                "SizeBytes": 331,
+                "StreamViewType": "NEW_AND_OLD_IMAGES"
+            },
+            "eventSourceARN": "arn:aws:dynamodb:eu-central-1:830483348154:table/orders/stream/2021-09-17T16:29:18.184"
+        }
+    ]
+}

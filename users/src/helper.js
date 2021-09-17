@@ -46,7 +46,35 @@ const seedUserProfiles = async () => {
     }
 }
 
+const updateUserBudget = async (userId, budget) => {
+    const docClient = new AWS.DynamoDB.DocumentClient({
+        region: 'eu-central-1',
+    })
+
+    const params = {
+        TableName: process.env.usersTableName,
+        Key: { userId },
+        UpdateExpression: 'set #budget=:budget',
+        ExpressionAttributeNames: {
+            '#budget': 'budget',
+        },
+        ExpressionAttributeValues: {
+            ':budget': budget,
+        },
+        ReturnValues: 'ALL_NEW',
+    }
+
+    await docClient.update(params)
+        .promise()
+        .then((data) => data.Attributes)
+        .catch((err) => {
+            console.log('Error updating user budget', err)
+            throw Error('Error updating user budget')
+        })
+}
+
 module.exports = {
     getUserProfile,
     seedUserProfiles,
+    updateUserBudget,
 }

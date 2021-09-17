@@ -2,7 +2,7 @@ const SYNC_LAMBDA_INVOKE_TYPE = 'RequestResponse'
 
 const FUNCTION_NAMES = {
     GET_USER_PROFILE: 'userProfileResponseManager',
-    REMOVE_BUDGET_FROM_USER: 'userProfileRemoveBudget',
+    UPDATE_USER_BUDGET: 'userProfileUpdateBudget',
     GET_PRODUCTS: 'productResponseManager',
 }
 
