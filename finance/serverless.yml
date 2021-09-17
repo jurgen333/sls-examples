@@ -18,7 +18,7 @@ provider:
   name: aws
   runtime: nodejs12.x
   stage: dev
-  region: ${env:REGION,'eu-west-1'}
+  region: ${env:REGION,'eu-central-1'}
   stackName: ${self:service.name}Stack
   apiName: ${self:service.name}Api
   environment:
