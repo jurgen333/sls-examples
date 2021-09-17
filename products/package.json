@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "aws-sdk": "^2.990.0",
     "serverless-dotenv-plugin": "^3.9.0",
     "serverless-offline": "^8.2.0",
     "serverless-plugin-ifelse": "^1.0.7",
