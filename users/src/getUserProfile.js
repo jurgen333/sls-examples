@@ -5,7 +5,7 @@ const {
 
 module.exports.handler = async (event) => {
     // await seedUserProfiles()
-    const products = await getUserProfile(event.query)
+    const user = await getUserProfile(event.query)
 
-    return products
+    return user
 }

@@ -12,6 +12,8 @@ const {
 
 module.exports.handler = async (event) => {
     // await seedUserProfiles()
+
+    console.log('Event ', JSON.stringify(event, null, 2))
     const userProfile = await getUserProfile(event.body.userId)
     const products = await getProducts(event.body)
 
