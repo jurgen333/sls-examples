@@ -11,9 +11,8 @@
     "editor.detectIndentation": true,
     "editor.wordWrap": "on",
     "terminal.integrated.rendererType": "dom",
-    "python.pythonPath": "/Users/alfredobelfiori/miniconda3/python.app",
     "python.linting.pylintEnabled": true,
-    "workbench.colorTheme": "codeSTACKr Theme",
+    "workbench.colorTheme": "Default Light+",
     "window.zoomLevel": 0,
     "code-runner.executorMap": {
         "python": "$pythonPath -u $fullFileName"

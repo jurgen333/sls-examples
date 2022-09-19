@@ -4,7 +4,8 @@
   "description": "# sls create --template aws-nodejs --path products",
   "main": ".eslintrc.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "stress": "node stresTest.js"
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,8 @@
     "prettier": "^1.18.2"
   },
   "dependencies": {
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.2",
     "prettier-tslint": "^0.4.2"
   }
 }
